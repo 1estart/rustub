@@ -23,7 +23,7 @@ pub struct Block {
     pub nonce: u64,
 
     /// Hash of the current block (computed from all fields above)
-    pub hash: String,
+    hash: String,
 }
 
 impl Block {
@@ -86,6 +86,10 @@ impl Block {
         genesis.mine_block(4); // Easy difficulty for startup
         genesis
     }
+
+    pub fn get_hash(&self) -> &String {
+        &self.hash
+    }
 }
 
 #[cfg(test)]
@@ -95,7 +99,7 @@ mod tests {
     #[test]
     fn test_block_hash_is_consistent() {
         let block = Block::new(1, "Test Data".to_string(), "0".to_string());
-        let hash1 = block.hash.clone();
+        let hash1 = block.get_hash().clone();
         let hash2 = block.calculate_hash();
         assert_eq!(hash1, hash2);
     }
@@ -104,6 +108,6 @@ mod tests {
     fn test_mining_produces_valid_hash() {
         let mut block = Block::new(1, "Test".to_string(), "0".to_string());
         block.mine_block(3);
-        assert!(block.hash.starts_with("000"));
+        assert!(block.get_hash().starts_with("000"));
     }
 }

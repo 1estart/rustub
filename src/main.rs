@@ -6,7 +6,7 @@ mod chain;
 use chain::Blockchain;
 
 fn main() {
-    println!("🚀 RUSTubChain — Simple Tiny Understanding Blockchain\n");
+    println!("🚀 RUSTubChain — RUST Simple Tiny Understanding Blockchain\n");
 
     // Create a new blockchain
     let mut my_chain = Blockchain::new();
@@ -18,8 +18,4 @@ fn main() {
 
     // Show the result
     my_chain.print_chain();
-
-    // Integrity demonstration
-    println!("🧪 Integrity Test: Imagine changing data in Block #1...");
-    println!("   The validation would fail because hashes wouldn't match.");
 }

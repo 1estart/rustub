@@ -26,7 +26,7 @@ impl Blockchain {
 
     /// Adds a new block with data to the chain
     pub fn add_block(&mut self, data: String) {
-        let previous_hash = self.get_latest_block().hash.clone();
+        let previous_hash = self.get_latest_block().get_hash().clone();
         let mut new_block = Block::new(self.chain.len() as u64, data, previous_hash);
 
         // Mine the block before adding it
@@ -42,20 +42,20 @@ impl Blockchain {
             let previous = &self.chain[i - 1];
 
             // 1. Check link to the previous block
-            if current.previous_hash != previous.hash {
+            if &current.previous_hash != previous.get_hash() {
                 println!("❌ Error: previous_hash mismatch!");
                 return false;
             }
 
             // 2. Check if block hash is correct
-            if current.hash != current.calculate_hash() {
+            if current.get_hash() != &current.calculate_hash() {
                 println!("❌ Error: block hash does not match data!");
                 return false;
             }
 
             // 3. Check Proof-of-Work
             let prefix = "0".repeat(self.difficulty);
-            if !current.hash.starts_with(&prefix) {
+            if !current.get_hash().starts_with(&prefix) {
                 println!("❌ Error: hash does not meet difficulty!");
                 return false;
             }
@@ -71,8 +71,8 @@ impl Blockchain {
             println!(
                 "Block #{} | Hash: {}...{} | Nonce: {}",
                 block.index,
-                &block.hash[..8],
-                &block.hash[block.hash.len() - 8..],
+                &block.get_hash()[..8],
+                &block.get_hash()[block.get_hash().len() - 8..],
                 block.nonce
             );
         }
