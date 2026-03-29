@@ -90,6 +90,19 @@ impl Block {
     pub fn get_hash(&self) -> &String {
         &self.hash
     }
+
+    pub fn display_summary(&self) {
+        println!(
+            "Block #{} [{}]\n  Hash: {}...\n  Prev: {}...\n  Data: \"{}\"\n  Nonce:
+                {}",
+            self.index,
+            self.timestamp,
+            &self.hash[..16],
+            &self.previous_hash[..16],
+            self.data,
+            self.nonce
+        );
+    }
 }
 
 #[cfg(test)]
