@@ -18,4 +18,7 @@ fn main() {
 
     // Show the result
     my_chain.print_chain();
+
+    println!("\n🔍 Detailed view of latest block:");
+    my_chain.get_latest_block().display_summary();
 }
