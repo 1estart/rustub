@@ -94,6 +94,7 @@ impl Block {
     }
 
     pub fn display_summary(&self) {
+        let txs = serde_json::to_string(&self.transactions).unwrap_or_default();
         println!(
             "Block #{} [{}]\n  Hash: {}...\n  Prev: {}...\n  Data: \"{}\"\n  Nonce:
                 {}",
@@ -101,7 +102,7 @@ impl Block {
             self.timestamp,
             &self.hash[..16],
             &self.previous_hash[..16],
-            self.data,
+            txs,
             self.nonce
         );
     }

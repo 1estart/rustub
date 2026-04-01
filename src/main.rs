@@ -67,7 +67,6 @@ fn main() {
     }
     chain.print_chain();
 
-<<<<<<< HEAD
     // Shared state for threads
     let chain_shared = std::sync::Arc::new(std::sync::Mutex::new(chain));
 
