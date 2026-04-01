@@ -1,6 +1,7 @@
-use serde::{Deserialize, Serialize};
 /// src/block.rs
 /// Basic block structure for StubChain
+use crate::transaction::Transaction;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 /// Block structure - the fundamental building element of the blockchain
@@ -16,8 +17,8 @@ pub struct Block {
     /// If the previous block changes, this hash becomes invalid
     pub previous_hash: String,
 
-    /// Payload data (transactions will go here in the future)
-    pub data: String,
+    /// Transactions
+    pub transactions: Vec<Transaction>,
 
     /// Number changed during mining to find a valid hash
     pub nonce: u64,
@@ -28,7 +29,7 @@ pub struct Block {
 
 impl Block {
     /// Creates a new block with automatic hash computation
-    pub fn new(index: u64, data: String, previous_hash: String) -> Self {
+    pub fn new(index: u64, transactions: Vec<Transaction>, previous_hash: String) -> Self {
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .expect("Time went backwards")
@@ -38,7 +39,7 @@ impl Block {
             index,
             timestamp,
             previous_hash,
-            data,
+            transactions,
             nonce: 0,
             hash: String::new(), // Empty initially
         };
@@ -53,10 +54,11 @@ impl Block {
     pub fn calculate_hash(&self) -> String {
         let mut hasher = Sha256::new();
 
+        let txs = serde_json::to_string(&self.transactions).unwrap_or_default();
         // Combine all data into a single string
         let input = format!(
             "{}{}{}{}{}",
-            self.index, self.timestamp, self.previous_hash, self.data, self.nonce
+            self.index, self.timestamp, self.previous_hash, txs, self.nonce
         );
 
         hasher.update(input.as_bytes());
@@ -82,7 +84,7 @@ impl Block {
 
     /// Creates the first block in the chain (Genesis)
     pub fn genesis() -> Self {
-        let mut genesis = Block::new(0, "Genesis Block".to_string(), "0".to_string());
+        let mut genesis = Block::new(0, vec![], "0".to_string());
         genesis.mine_block(4); // Easy difficulty for startup
         genesis
     }
@@ -98,7 +100,7 @@ mod tests {
 
     #[test]
     fn test_block_hash_is_consistent() {
-        let block = Block::new(1, "Test Data".to_string(), "0".to_string());
+        let block = Block::new(1, vec![], "0".to_string());
         let hash1 = block.get_hash().clone();
         let hash2 = block.calculate_hash();
         assert_eq!(hash1, hash2);
@@ -106,7 +108,7 @@ mod tests {
 
     #[test]
     fn test_mining_produces_valid_hash() {
-        let mut block = Block::new(1, "Test".to_string(), "0".to_string());
+        let mut block = Block::new(1, vec![], "0".to_string());
         block.mine_block(3);
         assert!(block.get_hash().starts_with("000"));
     }

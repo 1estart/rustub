@@ -1,12 +1,14 @@
 /// src/chain.rs
 /// Blockchain management logic
 use crate::block::Block;
+use crate::transaction::Transaction;
 
 /// Blockchain - simply a vector of blocks with validation methods
 #[derive(Debug, Clone)]
 pub struct Blockchain {
     pub chain: Vec<Block>,
     pub difficulty: usize,
+    pub mempool: Vec<Transaction>,
 }
 
 impl Blockchain {
@@ -16,7 +18,47 @@ impl Blockchain {
         Blockchain {
             chain: vec![genesis],
             difficulty: 4,
+            mempool: vec![],
         }
+    }
+
+    /// Load chain from file
+    pub fn load_from_file(_path: &str) -> Option<Self> {
+        println!("📂 Trying to load chain from disk... (not implemented, using genesis)");
+        None
+    }
+
+    /// Save chain to file
+    pub fn save_to_file(&self, _path: &str) {
+        println!("💾 Saving chain to disk... (not implemented)");
+    }
+
+    pub fn add_transaction(&mut self, tx: Transaction) {
+        println!("📥 [TX] Received: {} -> {} ({})", tx.from, tx.to, tx.amount);
+        self.mempool.push(tx);
+    }
+
+    /// Create block from mempool and mine it
+    pub fn mine_mempool(&mut self, miner_reward_addr: String) {
+        if self.mempool.is_empty() {
+            println!("⚠️ Mempool empty, skipping mining");
+            return;
+        }
+
+        let mut txs = vec![Transaction::new(
+            "SYSTEM".into(),
+            miner_reward_addr,
+            100, // reward
+        )];
+        txs.append(&mut self.mempool);
+
+        self.add_block(txs);
+
+        println!(
+            "✅ Block #{} mined with {} transactions",
+            self.chain.len() - 1,
+            self.chain.last().unwrap().transactions.len()
+        );
     }
 
     /// Returns the latest block in the chain
@@ -25,9 +67,9 @@ impl Blockchain {
     }
 
     /// Adds a new block with data to the chain
-    pub fn add_block(&mut self, data: String) {
+    pub fn add_block(&mut self, transactions: Vec<Transaction>) {
         let previous_hash = self.get_latest_block().get_hash().clone();
-        let mut new_block = Block::new(self.chain.len() as u64, data, previous_hash);
+        let mut new_block = Block::new(self.chain.len() as u64, transactions, previous_hash);
 
         // Mine the block before adding it
         new_block.mine_block(self.difficulty);
